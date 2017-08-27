@@ -1,0 +1,25 @@
+# server
+server:
+  port: 7090
+  context-path: /chat
+
+# spring
+spring:
+  mvc:
+    favicon:
+      enabled: false
+  http:
+    encoding:
+      force: true
+
+  freemarker:
+    cache: false
+    charset: UTF-8
+    content-type: text/html
+    suffix: .html
+
+# log
+logging:
+  path: log
+
+

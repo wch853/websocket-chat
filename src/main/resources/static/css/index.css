@@ -1,0 +1,55 @@
+body {
+    font-family: "Microsoft YaHei";
+}
+
+nav a, .nav-li a {
+    color: #f2f2f2 !important;
+}
+
+@media (min-width: 768px) {
+    .nav-li:hover {
+        background-color: black;
+        font-size: 20px;
+    }
+}
+
+nav {
+    background-color: #424a57 !important;
+}
+
+.page-content {
+    margin-top: 65px;
+}
+
+#chat-body {
+    width: 100%;
+    border: 2px solid #cccccc;
+    height: 500px;
+}
+
+#chat-area {
+    width: 75%;
+    min-width: 300px;
+    display: inline-block;
+    border-right: 2px solid #cccccc;
+    border-bottom: 2px solid #cccccc;
+    height: 380px;
+    background-color: red;
+}
+
+#chat-bar {
+    width: auto;
+    min-width: 60px;
+    max-height: 500px;
+    height: 100%;
+    border-bottom: 2px solid #cccccc;
+    display: inline-block;
+    background-color: black;
+}
+
+#chat-input {
+    width: 75%;
+    height: 120px;
+    border-right: 2px solid #cccccc;
+    background-color: #424a57;
+}
