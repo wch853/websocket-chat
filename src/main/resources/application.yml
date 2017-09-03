@@ -21,9 +21,9 @@ spring:
 logging:
   file: log/chat.log
 
-# url
+# origins
 allowedOrigins:
   test: http://localhost
-  remote: http://106.14.200.121
+  product: http://106.14.200.121
 
 

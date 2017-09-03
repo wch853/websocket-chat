@@ -1,5 +1,7 @@
-package com.njfu.chat.config.webSocket;
+package com.njfu.chat.config;
 
+import com.njfu.chat.Service.ChatHandler;
+import com.njfu.chat.config.interceptor.ChatHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +16,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Value("${allowedOrigins.test}")
     private String testOrigin;
 
-    @Value("${allowedOrigins.remote}")
-    private String remoteOrigin;
+    @Value("${allowedOrigins.product}")
+    private String productOrigin;
 
     /**
      * 注册WebSocket处理器
@@ -27,7 +29,10 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
         // 设置允许域，当请求的RequestHeaders中的Origin不在允许范围内，禁止连接
-        String[] allowedOrigins = {testOrigin, remoteOrigin};
+        // 测试
+        String[] allowedOrigins = {testOrigin};
+        // 生产
+//        String[] allowedOrigins = {productOrigin};
 
         registry.addHandler(chatHandler(), "/chatHandler")
                 .addInterceptors(chatHandshakeInterceptor())

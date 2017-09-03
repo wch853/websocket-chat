@@ -1,3 +1,4 @@
+/* head */
 body {
     font-family: "Microsoft YaHei";
 }
@@ -17,14 +18,15 @@ nav {
     background-color: #424a57 !important;
 }
 
+/* 页面内容 */
 .page-content {
-    margin-top: 55px;
+    width: 70%;
+    margin: 55px auto 0 auto;
+    min-width: 400px;
 }
 
+/* chat主体 */
 .chat-body {
-    width: 70%;
-    margin: auto;
-    min-width: 400px;
     border: 2px solid #cccccc;
     height: 600px;
     font-size: 16px;
@@ -32,9 +34,10 @@ nav {
     background-color: #f2f2f2;
 }
 
+/* chat内容区域 */
 .chat-area {
     width: 75%;
-    height: 80%;
+    height: 480px;
     min-width: 300px;
     display: inline-block;
     border-right: 2px solid #cccccc;
@@ -45,6 +48,7 @@ nav {
     position: relative;
 }
 
+/* chat用户列表 */
 .chat-bar {
     width: 24%;
     float: right;
@@ -52,49 +56,156 @@ nav {
     height: 100%;
     display: inline-block;
     background-color: #f2f2f2;
+    cursor: default;
 }
 
+.chat-bar-head {
+    text-align: center;
+    color: #ffffff;
+    line-height: 35px;
+    background-color: #424a57;
+    margin-left: -20px;
+}
+
+/* 用户列表项 */
+.chat-bar-per {
+    border-bottom: 1px solid #424a57;
+    padding: 5px 0;
+}
+
+.chat-bar-per .glyphicon {
+    margin: 2px 5px;
+    color: #424a57;
+}
+
+.chat-bar-per div {
+    margin-left: 27px;
+    color: #406BFF;
+}
+
+/* chat输入区域 */
 .chat-input {
     width: 75%;
-    height: 20%;
+    height: 110px;
     border-right: 2px solid #cccccc;
     overflow-y: scroll;
     padding-bottom: 30px;
     background-color: #fff;
 }
 
+/* 控制按钮区域 */
 .chat-control {
     position: absolute;
     bottom: 0;
     right: 28%;
 }
-.chat-text {
-    display: inline-block;
-    width: auto;
-    max-width: 40%;
-    border-radius: 3px;
-    padding: 5px;
-    margin: 5px;
-    word-break: break-all;
-    clear: both;
+
+/* 字符数量提示 */
+.chat-size {
+    font-size: 14px;
 }
 
-.chat-text-theirs {
-    background-color: #fff;
+/* chat内容整体 */
+.chat-content {
+    width: auto;
+    max-width: 55%;
+    clear: both;
+    margin: 10px 20px 5px 20px;
+    position: relative;
+}
+
+.chat-content-mine {
+    float: right;
+}
+
+.chat-content-theirs {
+    float: left;
+}
+
+/* chat内容-用户名 */
+.chat-content-mine span {
+    font-size: 12px;
+    font-weight: 500;
+    position: absolute;
+    right: 40px;
+}
+
+.chat-content-theirs span {
+    font-size: 12px;
+    font-weight: 500;
+    position: absolute;
+    left: 40px;
+}
+
+/* 系统消息 */
+.chat-content-system {
+    width: 30%;
+    min-width: 200px;
+    margin: 10px auto;
+    text-align: center;
+    color: #fff;
+    background-color: rgba(165, 157, 164, 0.4);
+    border-radius: 2px;
+}
+
+/* 系统消息-用户名 */
+.chat-content-system span {
+    color: #228dff;
+    text-shadow: 4px 5px 6px rgba(91, 145, 204, 0.8);
+}
+
+/* chat内容-文本 */
+.chat-text {
+    border-radius: 3px;
+    padding: 7px 5px;
+    word-break: break-all;
+    margin-top: 20px;
+    min-width: 30px;
 }
 
 .chat-text-mine {
     background-color: #18ff13;
-    float: right;
+    margin-right: 40px;
 }
 
+.chat-text-theirs {
+    background-color: #fff;
+    margin-left: 40px;
+}
+
+/* chat内容-头像 */
+.chat-ico {
+    position: absolute;
+    top: 0;
+}
+
+.chat-ico-mine {
+    float: right;
+    right: 0;
+}
+
+.chat-ico-theirs {
+    float: left;
+    left: 0;
+}
+
+.chat-ico img {
+    width: 36px;
+}
+
+/* 用户列表按钮 */
 #view-online {
     display: none;
 }
 
+/* 小屏幕设备设置 */
 @media (max-width: 960px) {
-    .chat-body {
+    .page-content {
         width: 100%;
+    }
+
+    .page-header h1 {
+        margin-left: 30px;
     }
 
     .chat-area {
@@ -105,16 +216,15 @@ nav {
 
     .chat-input {
         width: 100%;
-        height: 19%;
     }
 
     .chat-bar {
         position: absolute;
         float: right;
         width: 180px;
-        height: 479px;
+        height: 481px;
         right: 1px;
-        margin-top: -484px;
+        margin-top: -487px;
         border: 2px solid #cccccc;
         border-right: 0;
         display: none;
@@ -122,12 +232,11 @@ nav {
     }
 
     .chat-control {
-        position: absolute;
         bottom: 0;
         right: 18px;
     }
 
-    .chat-text {
+    .chat-content {
         max-width: 60%;
     }
 
@@ -147,4 +256,3 @@ nav {
 #error-tip {
     color: #a52529;
 }
-

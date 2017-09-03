@@ -1,4 +1,4 @@
-package com.njfu.chat.config.webSocket;
+package com.njfu.chat.config.interceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
 
     /**
      * 握手前
-     * 为用户的WebsocketSession配置一些属性
+     * 为连接的WebsocketSession配置属性
      *
      * @param request    the current request
      * @param response   the current response
@@ -33,10 +33,11 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) throws Exception {
+        // 获取HttpSession
         ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
         HttpSession session = servletRequest.getServletRequest().getSession();
 
-        // 在握手前验证是否存在用户昵称，不存在用户昵称时拒绝连接
+        // 在握手前验证是否存在用户信息，不存在时拒绝连接
         String username = (String) session.getAttribute("username");
 
         if (null == username) {

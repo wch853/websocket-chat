@@ -3,7 +3,7 @@ package com.njfu.chat.domain;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * 统一响应
+ * 服务端响应
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatResponse {
@@ -21,7 +21,7 @@ public class ChatResponse {
     private String username;
 
     // 有效信息
-    private String payload;
+    private Object payload;
 
     public ChatResponse() {
     }
@@ -64,11 +64,11 @@ public class ChatResponse {
         this.username = username;
     }
 
-    public String getPayload() {
+    public Object getPayload() {
         return payload;
     }
 
-    public void setPayload(String payload) {
+    public void setPayload(Object payload) {
         this.payload = payload;
     }
 
@@ -79,7 +79,7 @@ public class ChatResponse {
                 ", httpSessionId='" + httpSessionId + '\'' +
                 ", host='" + host + '\'' +
                 ", username='" + username + '\'' +
-                ", payload='" + payload + '\'' +
+                ", payload=" + payload +
                 '}';
     }
 }

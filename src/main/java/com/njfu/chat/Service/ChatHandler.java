@@ -1,4 +1,4 @@
-package com.njfu.chat.config.webSocket;
+package com.njfu.chat.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.njfu.chat.domain.ChatResponse;
@@ -6,21 +6,31 @@ import com.njfu.chat.enums.ResponseTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * WebSocket处理器
- * 用于WebSocket生命周期的处理、单播消息、广播消息
+ * 用于处理WebSocketSession的生命周期、单播消息、广播消息
  */
 @Service
+@EnableScheduling
 public class ChatHandler implements WebSocketHandler {
 
     // 用于存放所有连接的WebSocketSession
     private static CopyOnWriteArraySet<WebSocketSession> webSocketSessions = new CopyOnWriteArraySet<>();
+
+    // 用户存放所有在线用户信息
+    private static CopyOnWriteArraySet<Map<String, Object>> sessionAttributes = new CopyOnWriteArraySet<>();
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     private static final Logger log = LoggerFactory.getLogger(ChatHandler.class);
 
@@ -35,8 +45,9 @@ public class ChatHandler implements WebSocketHandler {
      */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        // 成功连接后将该session加入集合
+        // 成功连接后将该连接加入集合
         webSocketSessions.add(session);
+        sessionAttributes.add(session.getAttributes());
         log.info("session {} open, attributes: {}.", session.getId(), session.getAttributes());
 
         // 单播消息返回给该用户认证信息，httpSessionId是用户认证唯一标准
@@ -44,10 +55,13 @@ public class ChatHandler implements WebSocketHandler {
 
         // 广播通知该用户上线
         this.broadcast(session, ResponseTypeEnum.ONLINE.getKey());
+
+        // 广播刷新在线列表
+        this.broadcast(ResponseTypeEnum.LIST.getKey(), sessionAttributes);
     }
 
     /**
-     * 处理收到的WebSocketMessage，本例中应为chat文本
+     * 处理收到的WebSocketMessage，根据需求只处理TextMessage
      * （参照org.springframework.web.socket.handler.AbstractWebSocketHandler）
      *
      * @param session session
@@ -82,10 +96,14 @@ public class ChatHandler implements WebSocketHandler {
             session.close();
         }
         webSocketSessions.remove(session);
-        log.error("session {}, error: {}.", session.getId(), exception.getMessage());
+        sessionAttributes.remove(session.getAttributes());
+        log.error("session {} error, errorMessage: {}.", session.getId(), exception.getMessage());
 
         // 广播异常掉线信息
         this.broadcast(session, ResponseTypeEnum.ERROR.getKey());
+
+        // 广播刷新在线列表
+        this.broadcast(ResponseTypeEnum.LIST.getKey(), sessionAttributes);
     }
 
     /**
@@ -98,10 +116,14 @@ public class ChatHandler implements WebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         webSocketSessions.remove(session);
+        sessionAttributes.remove(session.getAttributes());
         log.info("session {} close, closeStatus: {}.", session.getId(), closeStatus);
 
         // 广播下线信息
         this.broadcast(session, ResponseTypeEnum.OFFLINE.getKey());
+
+        // 广播刷新在线列表
+        this.broadcast(ResponseTypeEnum.LIST.getKey(), sessionAttributes);
     }
 
     /**
@@ -119,7 +141,7 @@ public class ChatHandler implements WebSocketHandler {
     }
 
     /**
-     * 封装response
+     * 封装response并转为json字符串
      *
      * @param session session
      * @param type    type
@@ -127,7 +149,7 @@ public class ChatHandler implements WebSocketHandler {
      * @return json response
      * @throws Exception Exception
      */
-    private String getResponse(WebSocketSession session, String type, String payload) throws Exception {
+    private String getResponse(WebSocketSession session, String type, Object payload) throws Exception {
         ChatResponse chatResponse;
 
         if (null == session) {
@@ -156,7 +178,7 @@ public class ChatHandler implements WebSocketHandler {
      * @param payload payload
      * @throws Exception Exception
      */
-    private void unicast(WebSocketSession session, String type, String payload) throws Exception {
+    private void unicast(WebSocketSession session, String type, Object payload) throws Exception {
         String response = this.getResponse(session, type, payload);
         session.sendMessage(new TextMessage(response));
     }
@@ -180,7 +202,7 @@ public class ChatHandler implements WebSocketHandler {
      * @param payload 消息内容
      * @throws Exception Exception
      */
-    private void broadcast(WebSocketSession session, String type, String payload) throws Exception {
+    private void broadcast(WebSocketSession session, String type, Object payload) throws Exception {
         String response = this.getResponse(session, type, payload);
 
         // 广播消息
@@ -207,7 +229,16 @@ public class ChatHandler implements WebSocketHandler {
      * @param payload payload
      * @throws Exception Exception
      */
-    public void broadcast(String type, String payload) throws Exception {
+    private void broadcast(String type, Object payload) throws Exception {
         this.broadcast(null, type, payload);
+    }
+
+    /**
+     * 定时任务，每分钟发送一次服务器时间
+     * @throws Exception Exception
+     */
+    @Scheduled(cron = "0 1-59 * * * ?")
+    private void sendServerTime() throws Exception {
+        this.broadcast(ResponseTypeEnum.TIME.getKey(), simpleDateFormat.format(new Date()));
     }
 }

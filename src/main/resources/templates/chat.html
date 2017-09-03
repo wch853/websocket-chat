@@ -23,6 +23,7 @@
     <link href="css/chat.css" rel="stylesheet">
 </head>
 <body>
+<div class="page-wrapper">
     <div class="row">
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <a class="navbar-brand" href="http://106.14.200.121">wch的个人主页</a>
@@ -47,23 +48,21 @@
     <div class="page-content">
         <div class="page-header">
             <h1>
-                在线聊天室
+                FreeChat
                 <small>使用WebSocket</small>
             </h1>
         </div>
 
         <div class="chat-body">
-            <div class="chat-area">
-                111
-            </div>
+            <div class="chat-area" id="area"></div>
             <div class="chat-bar">
-                <div style="border-bottom: 1px solid black">
-                    <div>wch853</div>
-                    <div>-- 222.222.222.222</div>
-                </div>
+                <div class="chat-bar-head">在线列表</div>
+                <div class="chat-bar-list"></div>
             </div>
-            <div class="chat-input" contenteditable="true"></div>
-            <div class="chat-control pull-right">
+            <!-- contenteditable and plaintext only -->
+            <div class="chat-input" contenteditable="plaintext-only"></div>
+            <div class="chat-control">
+                <span class="chat-size"></span>
                 <button class="btn btn-primary btn-sm" id="view-online">在线列表</button>
                 <button class="btn btn-primary btn-sm" id="send">发送</button>
             </div>
@@ -76,7 +75,6 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <!--<button type="button" class="close" data-dismiss="modal">×</button>-->
                     <h4 class="modal-title">
                         提示
                         <small id="error-tip"></small>
@@ -86,7 +84,7 @@
                     <div class="form-inline">
                         <div class="form-group">
                             <label for="add-username">请输入聊天昵称：</label>
-                            <input id="add-username" class="form-control" placeholder="请输入6~16位字符的聊天昵称">
+                            <input id="add-username" class="form-control" placeholder="请输入6~10位字符的聊天昵称">
                         </div>
                     </div>
                 </div>
@@ -96,7 +94,7 @@
             </div>
         </div>
     </div>
-
+</div>
 </body>
 <script type="text/javascript" src="js/chat.js"></script>
 </html>

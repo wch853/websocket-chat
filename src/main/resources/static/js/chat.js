@@ -38,21 +38,21 @@ verifyUser();
 $('#save-username').click(function () {
     var username = $('#add-username').val().trim();
     $('#error-tip').text('');
-    var reg = /^[0-9a-zA-Z]{6,16}$/;
+    var reg = /^[0-9a-zA-Z]{6,10}$/;
 
     // 验证用户昵称
     if (!reg.test(username)) {
-        $('#error-tip').text('（聊天昵称输入有误）');
+        $('#error-tip').text('（请输入6~10位字符的聊天昵称）');
     } else {
         $.ajax({
-           url: 'addUser',
-           data: {
-               username: username
-           },
-           success: function () {
-               $('#username-modal').modal('hide');
-               getConnect();
-           }
+            url: 'addUser',
+            data: {
+                username: username
+            },
+            success: function () {
+                $('#username-modal').modal('hide');
+                getConnect();
+            }
         });
     }
 });
@@ -71,6 +71,8 @@ function getConnect() {
         console.log('Not Support WebSocket! It\'s recommended to use chrome!');
         websocket = new SockJS('http://' + path + '/sockjs-chatHandler')
     }
+
+    // 配置WebSocket连接生命周期
     websocket.onopen = function () {
         console.log('WebSocket open!');
     };
@@ -80,7 +82,10 @@ function getConnect() {
     };
 
     websocket.onerror = function () {
-        alert('WebSocket error, reload the page!');
+        bootbox.alert({
+            title: '提示',
+            message: 'WebSocket error, reload the page!'
+        });
     };
 
     websocket.onclose = function () {
@@ -95,8 +100,11 @@ function getConnect() {
 // 本地httpSessionId
 var localSessionId;
 
+var $chatInput = $('.chat-input');
+var $chatArea = $('.chat-area');
+
 /**
- * 处理收到的消息
+ * 处理收到的服务端响应
  */
 function handleMessage(event) {
     var response = JSON.parse(event.data);
@@ -114,33 +122,188 @@ function handleMessage(event) {
     /** @namespace response.payload */
     var payload = response.payload;
 
-    if ('chat' === type) {
-        console.log('from session: ' + httpSessionId);
-        var $chatArea = $('.chat-area');
-        if (localSessionId === httpSessionId) {
-            $chatArea.append('<div class="chat-text chat-text-mine">' + payload + '</div><br>');
-        } else {
-            $chatArea.append('<div class="chat-text chat-text-theirs">' + payload + '</div><br>');
-        }
-    } else if ('online' === type) {
-        console.log('online: ' + username)
-    } else if ('offline' === type) {
-        console.log('offline: ' + username)
-    } else if ('authenticate' === type) {
-        console.log('authenticate: ' + username);
-        localSessionId = httpSessionId;
-    } else if ('error' === type) {
-        console.log('error: ' + username);
-    } else {
-        bootbox.alert('Unexpected message type.')
+    switch (type) {
+        case 'chat':
+            handleChatMessage(httpSessionId, username, payload);
+            break;
+        case 'online':
+            console.log('online: ' + username);
+            handleSystemMessage(username, type);
+            break;
+        case 'offline':
+            console.log('offline: ' + username);
+            handleSystemMessage(username, type);
+            break;
+        case 'error':
+            console.log('error: ' + username);
+            handleSystemMessage(username, type);
+            break;
+        case 'time':
+            console.log('time: ' + payload);
+            handleSystemMessage(null, type, payload);
+            break;
+        case 'list':
+            handleUserList(payload);
+            break;
+        case 'authenticate':
+            console.log('authenticate: ' + httpSessionId);
+            localSessionId = httpSessionId;
+            break;
+        default:
+            bootbox.alert({
+                title: '提示',
+                message: 'Unexpected message type.'
+            });
+            handleSystemMessage(null, type);
     }
 }
 
+/**
+ * 处理聊天文本信息
+ * 将本地用户消息与其它用户消息区分
+ */
+function handleChatMessage(httpSessionId, username, payload) {
+    if (localSessionId === httpSessionId) {
+        $chatArea.append(
+            '<div class="chat-content chat-content-mine">' +
+            '<span>' + username + '</span>' +
+            '<div class="chat-text chat-text-mine">' +
+            payload +
+            '</div>' +
+            '<div class="chat-ico chat-ico-mine">' +
+            '<img src="image/chat-ico.png">' +
+            '</div>' +
+            '</div>'
+        );
+    } else {
+        $chatArea.append(
+            '<div class="chat-content chat-content-theirs">' +
+            '<div class="chat-ico chat-ico-theirs">' +
+            '<img src="image/chat-ico.png">' +
+            '</div>' +
+            '<span>' + username + '</span>' +
+            '<div class="chat-text chat-text-theirs">' +
+            payload +
+            '</div>' +
+            '</div>'
+        );
+    }
+    // 将聊天内容区域滚动条置底
+    endScroll();
+}
+
+/**
+ * 维护在线列表
+ * @param payload
+ */
+function handleUserList(payload) {
+    var list = '';
+    $.each(payload, function (index, el) {
+        var username = el.username;
+        var host = el.host;
+        list +=
+            '<div class="chat-bar-per">' +
+            '<span class="glyphicon glyphicon-user"></span>' +
+            username +
+            '<div>' +
+            host +
+            '</div>' +
+            '</div>';
+    });
+    $('.chat-bar-list').html(list);
+}
+
+/**
+ * 处理系统消息
+ * @param username
+ * @param type
+ * @param payload
+ */
+function handleSystemMessage(username, type, payload) {
+    var message = '';
+    switch (type) {
+        case 'online':
+            message = '上线了';
+            break;
+        case  'offline':
+            message = '下线了';
+            break;
+        case 'error':
+            message = '掉线了';
+            break;
+        case 'time':
+            message = payload;
+            break;
+        default:
+            message = '系统炸了';
+    }
+
+    if (null !== username) {
+        $chatArea.append(
+            '<div class="chat-content chat-content-system">' + '用户' +
+            '<span>' + username + '</span>' + message +
+            '</div>'
+        );
+    } else {
+        if ('time' === type) {
+            $chatArea.append(
+                '<div class="chat-content chat-content-system">' + payload + '</div>'
+            );
+        } else {
+            $chatArea.append(
+                '<div class="chat-content chat-content-system">' + message + '</div>'
+            );
+        }
+    }
+
+    // 将聊天内容区域滚动条置底
+    endScroll();
+}
+
+/**
+ * 查看在线列表
+ */
 $('#view-online').click(function () {
     $('.chat-bar').fadeToggle(500);
 });
 
+/**
+ * 发送消息
+ */
 $('#send').click(function () {
-    var chatText = $('.chat-input').text();
-    websocket.send(chatText);
+    var chatText = $chatInput.text().trim();
+    if (chatText.length === 0) {
+        bootbox.alert({
+            title: '提示',
+            message: '发送内容不可为空！'
+        });
+    } else if (chatText.length > 120) {
+        bootbox.alert({
+            title: '提示',
+            message: '发送内容过长！'
+        });
+    } else {
+        $chatInput.empty();
+        websocket.send(chatText);
+    }
 });
+
+/**
+ * 字数统计
+ */
+$('.chat-size').text('0/120');
+$chatInput.on('focus paste input', function () {
+    var length = $chatInput.text().length;
+    $('.chat-size').text(length + '/120');
+
+    var input = $chatInput[0];
+    input.scrollTop = input.scrollHeight;
+});
+
+/**
+ * 聊天显示区域自动到底
+ */
+function endScroll() {
+    var area = $chatArea[0];
+    area.scrollTop = area.scrollHeight;
+}

@@ -19,14 +19,28 @@ public class ChatController {
         return "chat";
     }
 
+    /**
+     * 验证是否存在用户信息
+     * 根据HttpSession唯一确定用户身份
+     *
+     * @param session session
+     * @return json
+     */
     @RequestMapping("/verifyUser")
     public @ResponseBody
     String verifyUser(HttpSession session) {
         return (String) session.getAttribute("username");
     }
 
+    /**
+     * 新增用户信息
+     *
+     * @param session  session
+     * @param username username
+     */
     @RequestMapping("/addUser")
-    public @ResponseBody void addUser(HttpSession session, String username) {
+    public @ResponseBody
+    void addUser(HttpSession session, String username) {
         session.setAttribute("username", username);
     }
 }
