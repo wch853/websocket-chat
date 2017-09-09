@@ -1,5 +1,3 @@
-bootbox.setLocale('zh_CN');
-
 /**
  * 验证是否存在用户信息
  * 若不存在，要求输入用户信息
@@ -37,12 +35,12 @@ verifyUser();
  */
 $('#save-username').click(function () {
     var username = $('#add-username').val().trim();
-    $('#error-tip').text('');
+    $('.error-tip').text('');
     var reg = /^[0-9a-zA-Z]{6,10}$/;
 
     // 验证用户昵称
     if (!reg.test(username)) {
-        $('#error-tip').text('（请输入6~10位字符的聊天昵称）');
+        $('.error-tip').text('（请输入6~10位数字和英文字母组合）');
     } else {
         $.ajax({
             url: 'addUser',
@@ -69,6 +67,10 @@ function getConnect() {
         websocket = new WebSocket('ws://' + path + '/chatHandler');
     } else {
         console.log('Not Support WebSocket! It\'s recommended to use chrome!');
+        bootbox.alert({
+            title: '提示',
+            message: '您的浏览器不支持WebSocket，请切换到chrome获取最佳体验！'
+        });
         websocket = new SockJS('http://' + path + '/sockjs-chatHandler')
     }
 
@@ -84,7 +86,10 @@ function getConnect() {
     websocket.onerror = function () {
         bootbox.alert({
             title: '提示',
-            message: 'WebSocket error, reload the page!'
+            message: 'WebSocket连接异常，请刷新页面！',
+            callback: function () {
+                window.location.reload();
+            }
         });
     };
 
@@ -285,16 +290,25 @@ $('#send').click(function () {
     } else {
         $chatInput.empty();
         websocket.send(chatText);
+        textNum(0);
     }
 });
 
 /**
+ * 显示字数统计
+ * @param length
+ */
+function textNum(length) {
+    $('.chat-size').text(length + '/120');
+}
+
+/**
  * 字数统计
  */
-$('.chat-size').text('0/120');
+textNum(0);
 $chatInput.on('focus paste input', function () {
     var length = $chatInput.text().length;
-    $('.chat-size').text(length + '/120');
+    textNum(length);
 
     var input = $chatInput[0];
     input.scrollTop = input.scrollHeight;

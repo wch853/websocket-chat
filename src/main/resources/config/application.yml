@@ -5,6 +5,9 @@ server:
 
 # spring
 spring:
+  profiles:
+    # active profile
+    active: pro
   mvc:
     favicon:
       enabled: false
@@ -21,9 +24,18 @@ spring:
 logging:
   file: log/chat.log
 
-# origins
-allowedOrigins:
-  test: http://localhost
-  product: http://106.14.200.121
+---
 
+# dev profile
+spring:
+  profiles: dev
 
+origin: http://localhost
+
+---
+
+# pro profile
+spring:
+  profiles: pro
+
+origin: http://106.14.200.121

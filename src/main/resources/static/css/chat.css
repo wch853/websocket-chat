@@ -25,12 +25,17 @@ nav {
     min-width: 400px;
 }
 
+/* 错误提示 */
+.error-tip {
+    color: #a52529;
+}
+
 /* chat主体 */
 .chat-body {
-    border: 2px solid #cccccc;
     height: 600px;
     font-size: 16px;
     position: relative;
+    border: 2px solid #cccccc;
     background-color: #f2f2f2;
 }
 
@@ -40,64 +45,64 @@ nav {
     height: 480px;
     min-width: 300px;
     display: inline-block;
+    position: relative;
     border-right: 2px solid #cccccc;
     border-bottom: 2px solid #cccccc;
     background: url(../image/chat-background-lg.jpg) no-repeat;
     background-size: cover;
     overflow-y: scroll;
-    position: relative;
 }
 
 /* chat用户列表 */
 .chat-bar {
     width: 24%;
-    float: right;
     min-width: 60px;
     height: 100%;
+    float: right;
+    cursor: default;
     display: inline-block;
     background-color: #f2f2f2;
-    cursor: default;
 }
 
 .chat-bar-head {
     text-align: center;
     color: #ffffff;
+    margin-left: -20px;
     line-height: 35px;
     background-color: #424a57;
-    margin-left: -20px;
 }
 
 /* 用户列表项 */
 .chat-bar-per {
-    border-bottom: 1px solid #424a57;
     padding: 5px 0;
+    border-bottom: 1px solid #424a57;
 }
 
 .chat-bar-per .glyphicon {
-    margin: 2px 5px;
     color: #424a57;
+    margin: 2px 5px;
 }
 
 .chat-bar-per div {
-    margin-left: 27px;
     color: #406BFF;
+    margin-left: 27px;
 }
 
 /* chat输入区域 */
 .chat-input {
     width: 75%;
     height: 110px;
+    padding-bottom: 30px;
     border-right: 2px solid #cccccc;
     overflow-y: scroll;
-    padding-bottom: 30px;
     background-color: #fff;
 }
 
 /* 控制按钮区域 */
 .chat-control {
     position: absolute;
-    bottom: 0;
     right: 28%;
+    bottom: 0;
 }
 
 /* 字符数量提示 */
@@ -110,8 +115,8 @@ nav {
     width: auto;
     max-width: 55%;
     clear: both;
-    margin: 10px 20px 5px 20px;
     position: relative;
+    margin: 10px 20px 5px 20px;
 }
 
 .chat-content-mine {
@@ -139,38 +144,38 @@ nav {
 
 /* 系统消息 */
 .chat-content-system {
+    text-align: center;
+    color: #fff;
     width: 30%;
     min-width: 200px;
     margin: 10px auto;
-    text-align: center;
-    color: #fff;
-    background-color: rgba(165, 157, 164, 0.4);
     border-radius: 2px;
+    background-color: rgba(165, 157, 164, 0.4);
 }
 
 /* 系统消息-用户名 */
 .chat-content-system span {
-    color: #228dff;
+    color: #141429;
     text-shadow: 4px 5px 6px rgba(91, 145, 204, 0.8);
 }
 
 /* chat内容-文本 */
 .chat-text {
-    border-radius: 3px;
-    padding: 7px 5px;
-    word-break: break-all;
-    margin-top: 20px;
     min-width: 30px;
+    padding: 7px 5px;
+    margin-top: 20px;
+    word-break: break-all;
+    border-radius: 3px;
 }
 
 .chat-text-mine {
-    background-color: #18ff13;
     margin-right: 40px;
+    background-color: #18ff13;
 }
 
 .chat-text-theirs {
-    background-color: #fff;
     margin-left: 40px;
+    background-color: #fff;
 }
 
 /* chat内容-头像 */
@@ -200,7 +205,8 @@ nav {
 
 /* 小屏幕设备设置 */
 @media (max-width: 960px) {
-    .page-content {
+    .page-content,
+    .chat-input {
         width: 100%;
     }
 
@@ -214,15 +220,11 @@ nav {
         background-size: cover;
     }
 
-    .chat-input {
-        width: 100%;
-    }
-
     .chat-bar {
-        position: absolute;
-        float: right;
         width: 180px;
         height: 481px;
+        position: absolute;
+        float: right;
         right: 1px;
         margin-top: -487px;
         border: 2px solid #cccccc;
@@ -243,16 +245,4 @@ nav {
     #view-online {
         display: inline;
     }
-}
-
-#username-modal .modal-dialog {
-    width: 450px;
-}
-
-#username-modal #add-username {
-    width: 240px;
-}
-
-#error-tip {
-    color: #a52529;
 }

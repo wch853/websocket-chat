@@ -1,2 +1,2 @@
 # WebSocket-Chat
-使用WebSocket构建在线聊天室应用。
+使用WebSocket构建在线聊天室应用

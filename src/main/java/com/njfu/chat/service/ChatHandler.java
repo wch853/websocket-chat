@@ -1,4 +1,4 @@
-package com.njfu.chat.Service;
+package com.njfu.chat.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.njfu.chat.domain.ChatResponse;
@@ -115,12 +115,14 @@ public class ChatHandler implements WebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        webSocketSessions.remove(session);
+        boolean removeNow = webSocketSessions.remove(session);
         sessionAttributes.remove(session.getAttributes());
         log.info("session {} close, closeStatus: {}.", session.getId(), closeStatus);
 
-        // 广播下线信息
-        this.broadcast(session, ResponseTypeEnum.OFFLINE.getKey());
+        if (removeNow) {
+            // 广播下线信息
+            this.broadcast(session, ResponseTypeEnum.OFFLINE.getKey());
+        }
 
         // 广播刷新在线列表
         this.broadcast(ResponseTypeEnum.LIST.getKey(), sessionAttributes);
@@ -234,10 +236,10 @@ public class ChatHandler implements WebSocketHandler {
     }
 
     /**
-     * 定时任务，每分钟发送一次服务器时间
+     * 定时任务，每5分钟发送一次服务器时间
      * @throws Exception Exception
      */
-    @Scheduled(cron = "0 1-59 * * * ?")
+    @Scheduled(cron = "0 0-59/5 * * * ?")
     private void sendServerTime() throws Exception {
         this.broadcast(ResponseTypeEnum.TIME.getKey(), simpleDateFormat.format(new Date()));
     }
