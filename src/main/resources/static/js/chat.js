@@ -84,6 +84,7 @@ function getConnect() {
     };
 
     websocket.onerror = function () {
+        console.log('WebSocket error!');
         bootbox.alert({
             title: '提示',
             message: 'WebSocket连接异常，请刷新页面！',
@@ -94,7 +95,14 @@ function getConnect() {
     };
 
     websocket.onclose = function () {
-        console.log('WebSocket close!')
+        console.log('WebSocket close!');
+        bootbox.alert({
+            title: '提示',
+            message: 'WebSocket连接断开，请刷新页面！',
+            callback: function () {
+                window.location.reload();
+            }
+        });
     };
 
     window.onbeforeunload = function () {
@@ -109,7 +117,7 @@ var $chatInput = $('.chat-input');
 var $chatArea = $('.chat-area');
 
 /**
- * 处理收到的服务端响应
+ * 处理收到的服务端响应，根据消息类型调用响应处理方法
  */
 function handleMessage(event) {
     var response = JSON.parse(event.data);
