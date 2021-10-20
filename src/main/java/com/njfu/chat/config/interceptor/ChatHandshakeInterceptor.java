@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * WebSocketHandshake拦截器
@@ -19,6 +21,9 @@ import java.util.Map;
 public class ChatHandshakeInterceptor implements HandshakeInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(ChatHandshakeInterceptor.class);
+
+    @Resource
+    private CopyOnWriteArraySet<String> USER_NAME_SET;
 
     /**
      * 握手前
@@ -30,7 +35,6 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
      * @param attributes attributes from the HTTP handshake to associate with the WebSocket
      *                   session; the provided attributes are copied, the original map is not used.
      * @return whether to proceed with the handshake ({@code true}) or abort ({@code false}) 通过true/false决定是否连接
-     *
      */
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
@@ -42,7 +46,9 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
         // 在握手前验证是否存在用户信息，不存在时拒绝连接
         String username = (String) session.getAttribute("username");
 
-        if (null == username) {
+        log.info("{}",username);
+        if (null == username
+                || USER_NAME_SET.contains(username)) {
             log.error("Invalid User!");
             return false;
         } else {
@@ -51,6 +57,7 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
             // httpSessionId用于唯一确定连接客户端的身份
             attributes.put("httpSessionId", session.getId());
             attributes.put("host", request.getRemoteAddress().getHostString());
+            USER_NAME_SET.add(username);
             return true;
         }
 
