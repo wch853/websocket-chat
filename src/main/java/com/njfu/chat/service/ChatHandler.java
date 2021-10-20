@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.*;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -36,6 +37,9 @@ public class ChatHandler implements WebSocketHandler {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Resource
+    private CopyOnWriteArraySet<String> USER_NAME_SET;
 
     /**
      * 成功连接WebSocket后执行
@@ -104,6 +108,9 @@ public class ChatHandler implements WebSocketHandler {
 
         // 广播刷新在线列表
         this.broadcast(ResponseTypeEnum.LIST.getKey(), sessionAttributes);
+
+        //去除登陆用户
+        USER_NAME_SET.remove(getSessionUserName(session));
     }
 
     /**
@@ -126,6 +133,9 @@ public class ChatHandler implements WebSocketHandler {
 
         // 广播刷新在线列表
         this.broadcast(ResponseTypeEnum.LIST.getKey(), sessionAttributes);
+
+        //去除登陆用户
+        USER_NAME_SET.remove(getSessionUserName(session));
     }
 
     /**
@@ -242,5 +252,9 @@ public class ChatHandler implements WebSocketHandler {
     @Scheduled(cron = "0 0-59/5 * * * ?")
     private void sendServerTime() throws Exception {
         this.broadcast(ResponseTypeEnum.TIME.getKey(), simpleDateFormat.format(new Date()));
+    }
+
+    private String getSessionUserName(WebSocketSession session){
+        return String.valueOf(session.getAttributes().get("username"));
     }
 }
